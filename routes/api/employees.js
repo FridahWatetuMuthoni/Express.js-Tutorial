@@ -3,7 +3,7 @@ const router = express.Router()
 const path = require('path')
 const data = {}
 data.employees = require('../../models/employees.json')
-const{getAllEmployees,createNewEmployee,updateEmployee,deleteEmployee}=require('../../controllers/employeesController')
+const { getAllEmployees, createNewEmployee, updateEmployee, deleteEmployee } = require('../../controllers/employeesController')
 
 
 router.route('/')

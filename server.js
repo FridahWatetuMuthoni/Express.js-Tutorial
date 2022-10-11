@@ -7,13 +7,26 @@ const {logger} = require('./middleware/logEvents');
 const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
 const cors_options = require('./config/corsOptions');
+const verifyJWT = require('./middleware/verifyJWT')
+const cookieParser = require('cookie-parser')
+const credentials = require('./middleware/credentials')
 
 
 //WRITE CODE HERE
 
+//JWT NEEDED INSTALLS
+//cookie-parser, dotenv, jsonwebtoken
+
+//To get a random encrypted string one node one the console and type the following
+//> require('crypto').randomBytes(64).toString('hex')
+
 //CUSTOM MIDDLEWARES
 //custom middleware logger
 app.use(logger);
+
+// Handle options credentials check - before CORS!
+// and fetch cookies credentials requirement
+app.use(credentials);
 
 //THIRD PARTY MIDDLEWARE
 //cors middleware (cross orign resource sharing)
@@ -28,14 +41,26 @@ app.use(express.urlencoded({extended:false}));
 //built-in middleware for json
 app.use(express.json());
 
+//middleware for cookies
+app.use(cookieParser())
+
 //built-in middleware for serving static files
 app.use('/',express.static(path.join(__dirname, '/public')))
 app.use('/subdir',express.static(path.join(__dirname, '/public')))
 
 //Routes
-app.use('/',require('./routes/root'))
+app.use('/', require('./routes/root'))
+app.use('/register', require('./routes/register'))
+app.use('/auth', require('./routes/auth'))
+app.use('/refresh', require('./routes/refresh'))
+app.use('/logout', require('./routes/logout'))
+
+
+//Everthing after this middleware will require jwt token to access them
+app.use(verifyJWT)
+app.use('/employees', require('./routes/api/employees'))
 app.use('/subdir', require('./routes/subdir'))
-app.use('/employees',require('./routes/api/employees'))
+
 
 //a catch all route
 app.all('*', (req, res) => {
