@@ -1,13 +1,8 @@
 //To encrypt our passwords install npm  install  bcrypt
-const fs_promises = require('fs').promises;
-const path = require('path')
 const bcrypt = require('bcrypt')
+const User = require('../models/User')
 
 
-const usersDB = {
-    users: require('../models/users.json'),
-    setUsers:function(data){this.users=data}
-}
 
 //handler for our user information (Registering a new user)
 const handlerNewUser = async (req, res) => {
@@ -17,7 +12,8 @@ const handlerNewUser = async (req, res) => {
     }
     //check for duplicate username in the database
     //console.log(usersDB.users)
-    const duplicate = usersDB.users.find(person => person.username === user)
+    //const duplicate = usersDB.users.find(person => person.username === user)
+    const duplicate = await User.findOne({username:user}).exec()
     if (duplicate) {
         return res.sendStatus(409) //conflict
     }
@@ -25,11 +21,13 @@ const handlerNewUser = async (req, res) => {
         try {
         //encrypt the password
             const hashed_password = await bcrypt.hash(password, 10)
-        //store the new user
-        const newUser = { "username": user,"roles":{"User":2001}, "password": hashed_password }
-        usersDB.setUsers([...usersDB.users, newUser])
+        //create and store the new user
+            const result = await User.create({ "username": user, "password": hashed_password })
+            console.log(result)
+        /*usersDB.setUsers([...usersDB.users, newUser])
         await fs_promises.writeFile(path.join(__dirname, '..', 'models', 'users.json'), JSON.stringify(usersDB.users))
         console.log(usersDB.users)
+        */
         res.status(201).json({'success':`New user ${user} created`})
     }
     catch (err) {

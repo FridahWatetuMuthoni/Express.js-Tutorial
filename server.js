@@ -10,9 +10,17 @@ const cors_options = require('./config/corsOptions');
 const verifyJWT = require('./middleware/verifyJWT')
 const cookieParser = require('cookie-parser')
 const credentials = require('./middleware/credentials')
+const mongoose = require('mongoose')
+const connectDB=require('./config/dbConn')
 
 
 //WRITE CODE HERE
+
+//DATABASE
+//install mongoose ::npm install mongoose
+//DATABASE_URL = mongodb+srv://frizz:@fraridah7040@cluster0.qf2onto.mongodb.net/CompanyDB?retryWrites=true&w=majority
+//connect to mongoDB
+connectDB()
 
 //JWT NEEDED INSTALLS
 //cookie-parser, dotenv, jsonwebtoken
@@ -59,6 +67,7 @@ app.use('/logout', require('./routes/logout'))
 //Everthing after this middleware will require jwt token to access them
 app.use(verifyJWT)
 app.use('/employees', require('./routes/api/employees'))
+app.use('/users', require('./routes/api/users'));
 app.use('/subdir', require('./routes/subdir'))
 
 
@@ -79,9 +88,14 @@ app.all('*', (req, res) => {
 //custom middleware error handler
 app.use(errorHandler)
 
+//only listen to requests when the database is connected
+mongoose.connection.once('open', () => {
+    console.log('Connected to mongoDB')
+
 app.listen(PORT,()=>{
     console.log(`Server running on port ${PORT}`)
 });
+})
 
 /*
 ROUTING

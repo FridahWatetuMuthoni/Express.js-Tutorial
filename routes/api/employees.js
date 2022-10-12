@@ -3,7 +3,7 @@ const router = express.Router()
 const path = require('path')
 const data = {}
 data.employees = require('../../models/employees.json')
-const { getAllEmployees, createNewEmployee, updateEmployee, deleteEmployee } = require('../../controllers/employeesController')
+const { getAllEmployees, createNewEmployee, updateEmployee, deleteEmployee,getEmployee } = require('../../controllers/employeesController')
 const ROLES_LIST = require('../../config/roles_list')
 const verifyRoles = require('../../middleware/VerifyRoles')
 
@@ -15,8 +15,7 @@ router.route('/')
     .delete(verifyRoles(ROLES_LIST.Admin),deleteEmployee)
 
 router.route('/:id')
-    .get((req, res) => {
-        res.json({"id":req.params.id})
-    })
+    .get(getEmployee)
+
 
 module.exports = router;
