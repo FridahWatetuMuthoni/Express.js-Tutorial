@@ -17,7 +17,7 @@ const createNewEmployee = async (req, res) => {
         lastname: req.body.lastname
     }*/
     if (!req?.body?.firstname || !req?.body?.lastname) {
-        return res.status(400).res.json({"message":"First and last name required"})
+        return res.status(400).json({"message":"First and last name required"})
     }
     try {
         const result = await Employee.create({
